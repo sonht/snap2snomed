@@ -38,7 +38,7 @@ WORKER_ID = os.environ.get("SNAP2SNOMED_WORKER_ID", socket.gethostname())
 AGENT_COMMAND = os.environ.get("TERMINOLOGY_AGENT_COMMAND", "")
 PROMPT_PATH = os.environ.get(
     "TERMINOLOGY_AGENT_PROMPT",
-    "docs/icd10-who-cm-mapping-studio/MASTER-MAPPING-PROMPT-v0.2.md",
+    "docs/icd10-who-cm-mapping-studio/MASTER-MAPPING-PROMPT-v0.3.md",
 )
 RUNTIME_NAME = os.environ.get("TERMINOLOGY_AGENT_RUNTIME", "CLI_AGENT")
 RUNTIME_VERSION = os.environ.get("TERMINOLOGY_AGENT_VERSION", "")
