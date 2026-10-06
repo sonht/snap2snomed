@@ -51,6 +51,10 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         .antMatchers("/v3/api-docs/**").permitAll()
         .antMatchers("/swagger-ui/**").permitAll()
         .antMatchers("/swagger-ui.html").permitAll()
+        // Machine-to-machine worker endpoints use a dedicated X-Agent-Worker-Token
+        // validated inside AgentWorkerRestController. They intentionally do not use
+        // an end-user JWT or inherit project modification privileges.
+        .antMatchers("/agent-worker/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilterAfter(new PreAuthFilter(webSecurity), BasicAuthenticationFilter.class)
@@ -58,10 +62,6 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         .jwt();
   }
 
-  /**
-   * CORS Configuration required for the frontend to communicate with the API
-   * even if it's hosted on a different domain
-   */
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration corsConfig = new CorsConfiguration();
@@ -80,5 +80,4 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     source.registerCorsConfiguration("/**", corsConfig);
     return source;
   }
-
 }

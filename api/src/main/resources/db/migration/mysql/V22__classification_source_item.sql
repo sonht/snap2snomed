@@ -1,0 +1,35 @@
+CREATE TABLE mapping_source_item (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  map_id BIGINT NOT NULL,
+  imported_code_id BIGINT NULL,
+  parent_item_id BIGINT NULL,
+  source_item_type VARCHAR(32) NOT NULL,
+  source_term_type VARCHAR(32) NULL,
+  instruction_type VARCHAR(40) NULL,
+  who_code VARCHAR(50) NOT NULL,
+  rubric_title VARCHAR(2048) NULL,
+  raw_text VARCHAR(4096) NOT NULL,
+  reconstructed_text VARCHAR(4096) NULL,
+  lead_term VARCHAR(1024) NULL,
+  modifier_path VARCHAR(4096) NULL,
+  index_depth INT NULL,
+  source_volume VARCHAR(32) NULL,
+  source_location VARCHAR(255) NULL,
+  source_order BIGINT NOT NULL,
+  reconstruction_method VARCHAR(40) NULL,
+  reconstruction_confidence VARCHAR(16) NULL,
+  mapping_eligible BIT NOT NULL DEFAULT 1,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_mapping_source_item_map_order (map_id, source_order),
+  KEY idx_mapping_source_item_code (map_id, who_code),
+  KEY idx_mapping_source_item_type (map_id, source_item_type, source_term_type),
+  KEY idx_mapping_source_item_parent (parent_item_id),
+  CONSTRAINT fk_mapping_source_item_map
+    FOREIGN KEY (map_id) REFERENCES map(id) ON DELETE CASCADE,
+  CONSTRAINT fk_mapping_source_item_imported_code
+    FOREIGN KEY (imported_code_id) REFERENCES imported_code(id) ON DELETE SET NULL,
+  CONSTRAINT fk_mapping_source_item_parent
+    FOREIGN KEY (parent_item_id) REFERENCES mapping_source_item(id) ON DELETE SET NULL
+);
