@@ -1,0 +1,61 @@
+CREATE TABLE mapping_agent_job (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  project_id BIGINT NOT NULL,
+  map_id BIGINT NULL,
+  job_type VARCHAR(40) NOT NULL,
+  role VARCHAR(40) NOT NULL,
+  status VARCHAR(32) NOT NULL,
+  prompt_version VARCHAR(64) NOT NULL,
+  input_payload LONGTEXT NOT NULL,
+  result_payload LONGTEXT NULL,
+  priority INT NOT NULL DEFAULT 0,
+  claimed_by VARCHAR(128) NULL,
+  claim_token VARCHAR(64) NULL,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  started TIMESTAMP NULL DEFAULT NULL,
+  heartbeat TIMESTAMP NULL DEFAULT NULL,
+  finished TIMESTAMP NULL DEFAULT NULL,
+  error_message VARCHAR(4096) NULL,
+  PRIMARY KEY (id),
+  KEY idx_agent_job_queue (status, priority, created),
+  KEY idx_agent_job_project (project_id, status),
+  CONSTRAINT fk_agent_job_project FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE,
+  CONSTRAINT fk_agent_job_map FOREIGN KEY (map_id) REFERENCES map(id) ON DELETE CASCADE
+);
+
+CREATE TABLE mapping_agent_run (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  job_id BIGINT NOT NULL,
+  role VARCHAR(40) NOT NULL,
+  runtime_type VARCHAR(40) NOT NULL,
+  runtime_name VARCHAR(128) NULL,
+  runtime_version VARCHAR(128) NULL,
+  prompt_version VARCHAR(64) NOT NULL,
+  input_hash VARCHAR(128) NULL,
+  output_json LONGTEXT NULL,
+  status VARCHAR(32) NOT NULL,
+  started TIMESTAMP NOT NULL,
+  finished TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_agent_run_job (job_id, id),
+  CONSTRAINT fk_agent_run_job FOREIGN KEY (job_id) REFERENCES mapping_agent_job(id) ON DELETE CASCADE
+);
+
+CREATE TABLE mapping_proposal (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  source_item_id BIGINT NOT NULL,
+  agent_run_id BIGINT NULL,
+  cm_code VARCHAR(50) NULL,
+  cm_name VARCHAR(2048) NULL,
+  mapping_relation VARCHAR(40) NOT NULL,
+  confidence VARCHAR(16) NULL,
+  mapping_notes VARCHAR(4096) NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'PROPOSED',
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_mapping_proposal_source (source_item_id, status),
+  KEY idx_mapping_proposal_target (cm_code),
+  CONSTRAINT fk_mapping_proposal_source FOREIGN KEY (source_item_id) REFERENCES mapping_source_item(id) ON DELETE CASCADE,
+  CONSTRAINT fk_mapping_proposal_run FOREIGN KEY (agent_run_id) REFERENCES mapping_agent_run(id) ON DELETE SET NULL
+);

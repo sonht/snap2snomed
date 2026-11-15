@@ -1,0 +1,18 @@
+[Unit]
+Description=Snap2SNOMED Terminology Agent Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=snap2snomed-agent
+WorkingDirectory=/opt/snap2snomed
+EnvironmentFile=/etc/snap2snomed/terminology-agent.env
+ExecStart=/usr/bin/python3 /opt/snap2snomed/agent-worker/worker.py
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,31 @@
+name: ICD-10 Mapping CI
+
+on:
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'agent-worker/**'
+      - 'docs/icd10-who-cm-mapping-studio/**'
+      - '.github/workflows/icd10-mapping-ci.yml'
+  push:
+    branches:
+      - 'feat/icd10-mapping-*'
+
+jobs:
+  backend-and-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Python worker syntax
+        run: python3 -m py_compile agent-worker/worker.py
+
+      - name: Compile and test backend
+        run: mvn -B -pl api -am test
